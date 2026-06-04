@@ -5,8 +5,6 @@ const convertBtn = document.getElementById("convertBtn");
 const resultDiv = document.getElementById("result");
 const rateInfo = document.getElementById("rateInfo");
 
-let chart;
-
 const currencies = [
     "AUD",
     "USD",
@@ -20,75 +18,91 @@ const currencies = [
     "HKD"
 ];
 
+// Populate dropdowns
 function populateCurrencies() {
 
     currencies.forEach(currency => {
 
         fromCurrency.innerHTML +=
-            `<option value="${currency}">
-                ${currency}
-            </option>`;
+            `<option value="${currency}">${currency}</option>`;
 
         toCurrency.innerHTML +=
-            `<option value="${currency}">
-                ${currency}
-            </option>`;
+            `<option value="${currency}">${currency}</option>`;
     });
 
     fromCurrency.value = "USD";
     toCurrency.value = "AUD";
 }
 
+// Convert currencies
 async function convertCurrency() {
 
-    const amount = amountInput.value;
+    try {
 
-    const from = fromCurrency.value;
-    const to = toCurrency.value;
+        resultDiv.innerHTML = "Loading...";
 
-    const url =
-        `https://api.frankfurter.app/latest?amount=${amount}&from=${from}&to=${to}`;
+        const amount = Number(amountInput.value);
+        const from = fromCurrency.value;
+        const to = toCurrency.value;
 
-    const response = await fetch(url);
-
-    const data = await response.json();
-
-    const converted = data.rates[to];
-
-    resultDiv.innerHTML =
-        `${amount} ${from} = ${converted.toFixed(2)} ${to}`;
-
-    const rateResponse =
-        await fetch(
-            `https://api.frankfurter.app/latest?from=${from}&to=${to}`
+        const response = await fetch(
+            `https://open.er-api.com/v6/latest/${from}`
         );
 
-    const rateData =
-        await rateResponse.json();
+        if (!response.ok) {
+            throw new Error("Failed to retrieve exchange rates");
+        }
 
-    rateInfo.innerHTML =
-        `1 ${from} = ${rateData.rates[to]} ${to}`;
+        const data = await response.json();
+
+        console.log(data);
+
+        const rate = data.rates[to];
+
+        if (!rate) {
+            throw new Error(`No exchange rate found for ${to}`);
+        }
+
+        const converted = amount * rate;
+
+        resultDiv.innerHTML =
+            `${amount.toLocaleString()} ${from} = ${converted.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })} ${to}`;
+
+        rateInfo.innerHTML =
+            `1 ${from} = ${rate.toFixed(4)} ${to}`;
+
+    } catch (error) {
+
+        console.error(error);
+
+        resultDiv.innerHTML =
+            "Unable to retrieve exchange rates.";
+
+        rateInfo.innerHTML = "";
+    }
 }
 
-document
-    .getElementById("swapBtn")
-    .addEventListener("click", () => {
+// Swap currencies
+document.getElementById("swapBtn").addEventListener("click", () => {
 
-        const temp = fromCurrency.value;
+    const temp = fromCurrency.value;
 
-        fromCurrency.value =
-            toCurrency.value;
+    fromCurrency.value = toCurrency.value;
+    toCurrency.value = temp;
 
-        toCurrency.value =
-            temp;
+    convertCurrency();
+});
 
-        convertCurrency();
-    });
+// Convert button
+convertBtn.addEventListener("click", convertCurrency);
 
-convertBtn.addEventListener(
-    "click",
-    convertCurrency
-);
+// Auto convert when currency changes
+fromCurrency.addEventListener("change", convertCurrency);
+toCurrency.addEventListener("change", convertCurrency);
 
+// Initialize page
 populateCurrencies();
 convertCurrency();

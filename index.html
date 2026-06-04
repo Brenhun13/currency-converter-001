@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Currency Converter</title>
+
+    <meta name="description"
+          content="Free live currency converter with exchange rates updated in real time.">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="page">
+
+    <!-- Left Ad -->
+    <aside class="ad-sidebar left-ad">
+        Ad Space
+    </aside>
+
+    <main class="converter-container">
+
+        <h1>Live Currency Converter</h1>
+
+        <div class="converter-card">
+
+            <input
+                type="number"
+                id="amount"
+                value="100"
+                min="0">
+
+            <div class="currency-row">
+
+                <select id="fromCurrency"></select>
+
+                <button id="swapBtn">
+                    ⇄
+                </button>
+
+                <select id="toCurrency"></select>
+
+            </div>
+
+            <button id="convertBtn">
+                Convert
+            </button>
+
+            <div id="result">
+                Loading...
+            </div>
+
+            <div id="rateInfo"></div>
+
+        </div>
+
+        <section class="chart-section">
+
+            <h2>30 Day Trend</h2>
+
+            <canvas id="historyChart"></canvas>
+
+        </section>
+
+        <!-- Responsive Ad -->
+        <div class="bottom-ad">
+            Ad Space
+        </div>
+
+    </main>
+
+    <!-- Right Ad -->
+    <aside class="ad-sidebar right-ad">
+        Ad Space
+    </aside>
+
+</div>
+
+<script src="js/app.js"></script>
+
+</body>
+</html>
